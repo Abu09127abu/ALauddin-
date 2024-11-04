@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AB Coin Game</title>
+    <style>
+        /* CSS styling */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .header, .image-bar, .slider-container {
+            display: none;
+        }
+        .header, .image-bar, .slider-container.task-hide {
+            display: block;
+        }
+        .header {
+            height: 60px;
+            width: calc(100% - 40px);
+            margin: 20px auto 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+        }
+        .header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-bar {
+            width: calc(100% - 40px);
+            margin: 10px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(to right, #ffffff, #ffeb3b);
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            color: black;
+        }
+        .coin-image {
+            width: 80px; /* Larger size for coin image */
+            pointer-events: none;
+            user-select: none;
+            margin-bottom: 10px;
+        }
+        .coin-counter {
+            font-weight: bold;
+            font-size: 24px;
+            color: black;
+            text-shadow: 0px 0px 5px rgba(255, 0, 0, 0.8);
+            margin-bottom: 10px;
+        }
+        .coin-text {
+            font-weight: bold;
+            font-size: 18px;
+            color: black;
+            text-shadow: 0px 0px 5px rgba(255, 0, 0, 0.8);
+        }
+        .task-container {
+            width: calc(100% - 40px); /* Full width minus margins */
+            margin: 20px auto; /* Centered on the page */
+            border-radius: 20px;
+            overflow: hidden;
+            background: #333;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            color: white;
+            max-height: 400px; /* Max height to avoid overflow */
+            overflow-y: auto; /* Enable scrolling */
+            text-align: center;
+            position: relative; /* Position relative for styling */
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #444;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .task-logo {
+            width: 50px;
+            margin-right: 10px;
+        }
+        .task-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .start-button {
+            background-color: #fff;
+            color: black;
+        }
+        .claim-button {
+            background-color: #ffeb3b;
+            color: black;
+        }
+        .complete-button {
+            background-color: green;
+            color: white;
+        }
+        .achievement-container {
+            width: calc(100% - 40px); /* Full width minus margins */
+            margin: 20px auto; /* Centered on the page */
+            border-radius: 20px;
+            overflow: hidden;
+            background: #222;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .achievement-scroll {
+            max-height: 200px; /* Set a fixed height for scrolling */
+            overflow-y: auto; /* Enable scrolling */
+            padding: 10px;
+            background: #333; /* Background for scrolling area */
+            border-radius: 10px;
+        }
+        .achievement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background: #444;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-shadow: 0px 0px 15px rgba(255, 255, 0, 0.6);
+            border-top: 2px solid #fff;
+        }
+        .navbar img {
+            width: 50px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .navbar img:hover {
+            transform: scale(1.1);
+        }
+        /* Airdrop Page Styles */
+        .airdrop-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .airdrop-box {
+            width: 150px;
+            height: 150px;
+            margin: 20px 0;
+            perspective: 1000px; /* Enable 3D perspective */
+        }
+        .box-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 10s infinite linear; /* Rotate animation */
+        }
+        .box-face {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: transparent;
+            border: 5px solid #ffeb3b;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+        }
+        .box-face img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .box-front  { transform: rotateY(  0deg) translateZ(75px); }
+        .box-back   { transform: rotateY(180deg) translateZ(75px); }
+        .box-right  { transform: rotateY( 90deg) translateZ(75px); }
+        .box-left   { transform: rotateY(-90deg) translateZ(75px); }
+        .box-top    { transform: rotateX( 90deg) translateZ(75px); }
+        .box-bottom { transform: rotateX(-90deg) translateZ(75px); }
+        @keyframes rotate {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section (only visible on Home) -->
+    <div class="header" id="header">
+        <img src="https://i.postimg.cc/3J03057s/AB-Coin-1.png" alt="AB Coin Logo">
+    </div>
+
+    <!-- Image Bar Section (only visible on Home) -->
+    <div class="image-bar" id="imageBar">
+        <img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" class="coin-image" alt="Coin Image">
+        <div id="coinCounter" class="coin-counter">0</div>
+        <div class="coin-text">AB Coin</div>
+    </div>
+
+    <!-- Task Section -->
+    <div class="task-container" id="taskContainer" style="display: none;">
+        <img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" class="coin-image" style="width: 80px;" alt="Coin Image">
+        <div>Earn more AB Coin</div>
+        <div id="taskList"></div> <!-- Task items will be injected here -->
+    </div>
+
+    <!-- Achievement Section (only visible on Task page) -->
+    <div class="achievement-container" id="achievementContainer" style="display: none;">
+        <div>Achievements</div>
+        <div class="achievement-scroll" id="achievementList"></div> <!-- Achievement items will be injected here -->
+    </div>
+
+    <!-- Airdrop Section -->
+    <div class="airdrop-container" id="airdropContainer">
+        <div class="airdrop-box">
+            <div class="box-inner">
+                <div class="box-face box-front"><img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Coin Image"></div>
+                <div class="box-face box-back"><img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Coin Image"></div>
+                <div class="box-face box-right"><img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Coin Image"></div>
+                <div class="box-face box-left"><img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Coin Image"></div>
+                <div class="box-face box-top"><img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Coin Image"></div>
+                <div class="box-face box-bottom"><img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Coin Image"></div>
+            </div>
+        </div>
+        <div>AB Coin Airdrop is coming soon</div>
+    </div>
+
+    <!-- Navbar Section -->
+    <div class="navbar">
+        <img src="https://i.postimg.cc/3rb7Pf58/Green-Gradient-Minimalist-Simple-Instagram-Profile-Picture-prev-ui.png" alt="Home" onclick="showPage('home')">
+        <img src="https://i.postimg.cc/2yLWqc0C/download-4-removebg-preview.png" alt="Task" onclick="showPage('task')">
+        <img src="https://i.postimg.cc/gjjDgH47/images-3-removebg-preview.png" alt="Airdrop" onclick="showPage('airdrop')">
+    </div>
+
+    <script>
+        let coinCount = 0; // Initialize coin count
+
+        const tasks = [
+            { id: 1, url: "https://t.me/abcoinchat", logo: "https://static.hamsterkombatgame.io/earn/telegram_channel.webp", description: "Telegram Task: Earn 2,000 AB Coin", reward: 2000 },
+            { id: 2, url: "https://www.youtube.com/@ABCointube", logo: "https://static.hamsterkombatgame.io/earn/youtube.webp", description: "YouTube Task: Earn 1,000 AB Coin", reward: 1000 },
+            { id: 3, url: "https://www.instagram.com/abcoinofficial/", logo: "https://static.hamsterkombatgame.io/earn/instagram.webp", description: "Instagram Task: Earn 1,500 AB Coin", reward: 1500 },
+            { id: 4, url: "https://t.me/abcoinchat", logo: "https://static.hamsterkombatgame.io/earn/telegram_channel.webp", description: "Telegram Task: Earn 2,000 AB Coin", reward: 2000 },
+            { id: 5, url: "https://www.youtube.com/@ABCointube", logo: "https://static.hamsterkombatgame.io/earn/youtube.webp", description: "YouTube Task: Earn 1,000 AB Coin", reward: 1000 }
+        ];
+
+        const achievements = [
+            { id: 1, description: "Complete all tasks", condition: () => tasks.every(task => localStorage.getItem(`task-${task.id}-completed`)) },
+            { id: 2, description: "Have 10,000 coins", condition: () => coinCount >= 10000 },
+            { id: 3, description: "Have 15,000 coins", condition: () => coinCount >= 15000 },
+            { id: 4, description: "Have 20,000 coins", condition: () => coinCount >= 20000 },
+            { id: 5, description: "Real-time player for 2 days", condition: () => {
+                const playerStartTime = localStorage.getItem('playerStartTime');
+                if (playerStartTime) {
+                    const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000;
+                    return Date.now() - new Date(playerStartTime) >= twoDaysInMillis;
+                }
+                return false;
+            } }
+        ];
+
+        // Function to load tasks
+        function loadTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <img class="task-logo" src="${task.logo}" alt="Task Logo">
+                    <span>${task.description}</span>
+                    <button class="task-button start-button" onclick="startTask(${task.id})">
+                        ${localStorage.getItem(`task-${task.id}-completed`) ? 'Complete' : 'Start'}
+                    </button>
+                `;
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        // Function to load achievements
+        function loadAchievements() {
+            const achievementList = document.getElementById('achievementList');
+            achievementList.innerHTML = '';
+            achievements.forEach(achievement => {
+                const achievementItem = document.createElement('div');
+                achievementItem.className = 'achievement-item';
+                achievementItem.innerHTML = `
+                    <span>${achievement.description}</span>
+                    <span style="color: ${achievement.condition() ? 'green' : 'red'};">&#x2714;</span>
+                `;
+                achievementList.appendChild(achievementItem);
+            });
+        }
+
+        function startTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task || localStorage.getItem(`task-${task.id}-completed`)) return;
+            window.open(task.url, '_blank');
+            coinCount += task.reward;
+            updateCoinCounter();
+            markTaskComplete(taskId);
+        }
+
+        function markTaskComplete(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            task.completed = true;
+            localStorage.setItem(`task-${task.id}-completed`, true);
+            loadTasks();
+            loadAchievements(); // Reload achievements after completing a task
+        }
+
+        function updateCoinCounter() {
+            document.getElementById('coinCounter').textContent = formatNumber(coinCount);
+            localStorage.setItem('coinCount', coinCount);
+            loadAchievements();
+        }
+
+        function showPage(page) {
+            document.getElementById('taskContainer').style.display = 'none';
+            document.getElementById('achievementContainer').style.display = 'none';
+            document.getElementById('airdropContainer').style.display = 'none';
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('imageBar').style.display = 'none';
+
+            if (page === 'home') {
+                document.getElementById('header').style.display = 'block';
+                document.getElementById('imageBar').style.display = 'block';
+            } else if (page === 'task') {
+                document.getElementById('taskContainer').style.display = 'block';
+                document.getElementById('achievementContainer').style.display = 'block';
+                loadTasks();
+            } else if (page === 'airdrop') {
+                document.getElementById('airdropContainer').style.display = 'flex';
+            }
+        }
+
+        window.onload = function() {
+            const storedCoins = localStorage.getItem('coinCount');
+            if (storedCoins) coinCount = parseInt(storedCoins, 10);
+            updateCoinCounter();
+            tasks.forEach(task => {
+                if (localStorage.getItem(`task-${task.id}-completed`)) task.completed = true;
+            });
+
+            if (!localStorage.getItem('playerStartTime')) {
+                localStorage.setItem('playerStartTime', new Date().toISOString());
+            }
+
+            loadAchievements();
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+</body>
+</html>
