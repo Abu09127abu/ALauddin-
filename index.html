@@ -293,9 +293,11 @@
 
         const achievements = [
             { id: 1, description: "Complete all tasks", condition: () => tasks.every(task => localStorage.getItem(`task-${task.id}-completed`)) },
-            { id: 2, description: "Have 10,000 coins", condition: () => coinCount >= 10000 },
-            { id: 3, description: "Have 15,000 coins", condition: () => coinCount >= 15000 },
-            { id: 4, description: "Have 20,000 coins", condition: () => coinCount >= 20000 },
+            { id: 2, description: "Have 1,000 coins", condition: () => coinCount >= 1000 },
+            { id: 3, description: "Have 1,500 coins", condition: () => coinCount >= 1500 },
+            { id: 4, description: "Have 2,000 coins", condition: () => coinCount >= 2000 },
+            { id: 6, description: "Have 2,500 coins", condition: () => coinCount >= 2500 },
+            { id: 7, description: "Have 3,000 coins", condition: () => coinCount >= 3000 },
             { id: 5, description: "Real-time player for 2 days", condition: () => {
                 const playerStartTime = localStorage.getItem('playerStartTime');
                 if (playerStartTime) {
