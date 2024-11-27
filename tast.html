@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* Top Box */
+    .top-box {
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      text-align: center;
+      width: 90%;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .top-box img {
+      width: 100px;
+      height: 100px;
+    }
+    .counter {
+      font-size: 29px;
+      margin-top: 14px;
+    }
+    .ab-label {
+      font-size: 20px;
+      color: #ccc;
+    }
+    /* Task Section */
+    .task-section {
+      width: 90%;
+      margin-top: 20px;
+    }
+    .task-title {
+      font-size: 18px;
+      margin: 20px 0 10px 0;
+      text-align: left;
+    }
+    .task-item {
+      background-color: #1c1c1c;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .task-item img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+    .task-item button {
+      padding: 5px 10px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .task-item button.completed {
+      background-color: gray;
+    }
+    .task-item button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+    /* Modal Popup */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 80%;
+    }
+    .modal-content input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid gray;
+    }
+    .modal-content button {
+      padding: 10px 20px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    /* Bottom Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #1c1c1c;
+      padding: 10px 0;
+    }
+    .nav-bar button {
+      width: 50px;
+      height: 50px;
+      background-color: black;
+      border: none;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+    }
+    .nav-bar button:focus {
+      outline: 2px solid white;
+    }
+    .nav-bar button.home {
+      background-image: url('home.png');
+    }
+    .nav-bar button.leader {
+      background-image: url('leader.png');
+    }
+   
+    .nav-bar button.airdrop {
+      background-image: url('airdrop.png');
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Box -->
+  <div class="top-box">
+    <img src="coin.png" alt="Coin">
+    <div class="counter" id="abCoinCounter"></div>
+    <div class="ab-label">$AB</div>
+  </div>
+
+  <!-- Task Section -->
+  <div class="task-section">
+    <div class="task-title">Daily Tasks</div>
+    <div id="dailyTaskContainer"></div>
+
+    <div class="task-title">Our Social/promotion</div>
+    <div id="partnerTaskContainer"></div>
+
+    <div class="task-title">Ads Tasks</div>
+    <div id="adsTaskContainer"></div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="nav-bar">
+    <button class="home" onclick="window.location.href='home.html'"></button>
+    <button class="leader" onclick="window.location.href='leader.html'"></button>
+  
+    <button class="airdrop" onclick="window.location.href='airdrop.html'"></button>
+  </div>
+
+  <!-- Modal for Task Code -->
+  <div class="modal" id="taskModal">
+    <div class="modal-content">
+      <h3>Enter Task Code</h3>
+      <input type="text" id="taskCodeInput" placeholder="Enter code here">
+      <button onclick="submitCode()">Submit</button>
+    </div>
+  </div>
+
+  <script>
+    // Task Data
+    const dailyTasks = [
+      { id: 1, url: "https://t.me/+P2HHpv1WVKBhMTNl", logo: "https://static.hamsterkombatgame.io/earn/telegram_channel.webp", description: "Telegram task earn 50 AB ", reward: 50, code: "1111" },
+    ];
+
+    const partnerTasks = [
+   { id: 3, url: "https://t.me/ABcoinairdrop", logo: "https://static.hamsterkombatgame.io/earn/telegram_channel.webp", description: "Our telegram chanel earn 100 AB", reward: 100, code: "AB121" },
+    ];
+
+    const adsTasks = [
+      { id: 3, url: "https://youtu.be/wgc3HDeM9q0?si=rQvjN9vNzptixIwj", logo: "https://static.hamsterkombatgame.io/earn/youtube.webp", description: "Watch 30 scound earn 30 AB ", reward: 30, code: "3214" },
+    ];
+   
+    
+
+    const abCoinCounter = document.getElementById("abCoinCounter");
+    const dailyTaskContainer = document.getElementById("dailyTaskContainer");
+    const partnerTaskContainer = document.getElementById("partnerTaskContainer");
+    const adsTaskContainer = document.getElementById("adsTaskContainer");
+    const taskModal = document.getElementById("taskModal");
+    const taskCodeInput = document.getElementById("taskCodeInput");
+
+    let selectedTask = null;
+
+    // Update AB Coin Counter
+    function updateAbCoinCounter() {
+      const abcoin = localStorage.getItem("abcoin") || 0;
+      abCoinCounter.textContent = abcoin;
+    }
+    updateAbCoinCounter();
+
+    // Check if Task is Completed
+    function isTaskCompleted(taskId) {
+      return localStorage.getItem(`taskCompleted_${taskId}`) === 'true';
+    }
+
+    // Render Tasks
+    function renderTasks() {
+      dailyTaskContainer.innerHTML = '';
+      partnerTaskContainer.innerHTML = '';
+      adsTaskContainer.innerHTML = '';
+
+      // Render Daily Tasks
+      dailyTasks.forEach(task => {
+        const taskItem = document.createElement("div");
+        taskItem.className = "task-item";
+        const isCompleted = isTaskCompleted(task.id);
+        taskItem.innerHTML = `
+          <img src="${task.logo}" alt="Task">
+          <div>${task.description}</div>
+          <button class="start-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="startTask(${task.id})">
+            ${isCompleted ? 'Completed' : 'Start'}
+          </button>
+        `;
+        dailyTaskContainer.appendChild(taskItem);
+      });
+
+      // Render Partner Tasks
+      partnerTasks.forEach(task => {
+        const taskItem = document.createElement("div");
+        taskItem.className = "task-item";
+        const isCompleted = isTaskCompleted(task.id);
+        taskItem.innerHTML = `
+          <img src="${task.logo}" alt="Task">
+          <div>${task.description}</div>
+          <button class="start-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="startTask(${task.id})">
+            ${isCompleted ? 'Completed' : 'Start'}
+          </button>
+        `;
+        partnerTaskContainer.appendChild(taskItem);
+      });
+
+      // Render Ads Tasks
+      adsTasks.forEach(task => {
+        const taskItem = document.createElement("div");
+        taskItem.className = "task-item";
+        const isCompleted = isTaskCompleted(task.id);
+        taskItem.innerHTML = `
+          <img src="${task.logo}" alt="Task">
+          <div>${task.description}</div>
+          <button class="start-btn ${isCompleted ? 'completed' : ''}" ${isCompleted ? 'disabled' : ''} onclick="startTask(${task.id})">
+            ${isCompleted ? 'Completed' : 'Start'}
+          </button>
+        `;
+        adsTaskContainer.appendChild(taskItem);
+      });
+    }
+
+    // Start Task
+    function startTask(taskId) {
+      selectedTask = [...dailyTasks, ...partnerTasks, ...adsTasks].find(task => task.id === taskId);
+      window.open(selectedTask.url, '_blank'); // Open task URL
+      taskModal.style.display = "flex";
+    }
+
+    // Submit Task Code
+    function submitCode() {
+      const enteredCode = taskCodeInput.value;
+      if (enteredCode === selectedTask.code) {
+        const abcoin = parseInt(localStorage.getItem("abcoin") || 0);
+        localStorage.setItem("abcoin", abcoin + selectedTask.reward);
+        localStorage.setItem(`taskCompleted_${selectedTask.id}`, 'true');
+        taskModal.style.display = "none";
+        renderTasks(); // Re-render tasks
+        updateAbCoinCounter();
+      }
+    }
+    
+    function formatNumber(num) {
+      if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
+      if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+      if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+      if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+      return num;
+    }
+
+    renderTasks(); // Initial render
+  </script>
+  <script type="module" src="popup.js"></script>
+  
+  
+</body>
+</html>

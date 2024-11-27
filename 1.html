@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claim AB Coin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #coinImage {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+    }
+    #loadingDots {
+      font-size: 30px;
+      letter-spacing: 5px;
+      margin-top: 20px;
+    }
+    #reward {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    #claimButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: white;
+      color: black;
+      border: 2px solid black;
+      cursor: pointer;
+      display: none;
+    }
+    #claimButton:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="content">
+    <!-- Coin Image and Loading -->
+    <img src="coin.png" id="coinImage" alt="Coin">
+    <div id="loadingDots">.</div>
+    <div id="reward"></div>
+    <button id="claimButton">Claim Reward</button>
+  </div>
+
+  <script>
+    // Check if the user has already claimed the reward
+    if (localStorage.getItem("abcoinClaimed")) {
+      window.location.href = "home.html";
+    }
+
+    // Simulate loading and reward generation
+    let dotCount = 0;
+    const loadingDots = document.getElementById("loadingDots");
+
+    // Animate the dots
+    const loadingInterval = setInterval(() => {
+      dotCount = (dotCount % 3) + 1;  // Limit to 3 dots
+      loadingDots.textContent = ".".repeat(dotCount);
+    }, 500); // Change dots every 500ms
+
+    // Simulate a loading time of 3-5 seconds
+    setTimeout(() => {
+      clearInterval(loadingInterval); // Stop the dot animation after loading is done
+      showReward(); // Show reward after loading completes
+    }, Math.random() * 2000 + 3000); // Random delay between 3 to 5 seconds
+
+    // Generate a random reward between 1000 and 7000
+    function showReward() {
+      const reward = Math.floor(Math.random() * (7000 - 1000 + 1)) + 1000;
+      document.getElementById("reward").textContent = `You have earned ${reward} AB Coin!`;
+
+      // Show the claim button
+      document.getElementById("claimButton").style.display = "inline-block";
+
+      // Add event listener to the claim button
+      document.getElementById("claimButton").addEventListener("click", () => {
+        localStorage.setItem("abcoin", reward);  // Save the reward to localStorage
+        localStorage.setItem("abcoinClaimed", true); // Flag the reward as claimed
+        window.location.href = "home.html";  // Redirect to home.html
+      });
+    }
+  </script>
+
+</body>
+</html>

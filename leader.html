@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leader Board</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .box {
+      width: 90%;
+      margin: 20px auto;
+      background-color: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .leaderboard {
+      margin-top: 20px;
+    }
+    .leader-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+    }
+    .leader-item img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+    .leader-item .rank {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .leader-item .name {
+      font-size: 18px;
+      flex-grow: 1;
+      text-align: center;
+    }
+    .leader-item .coin {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #1c1c1c;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+    .nav-bar button {
+      width: 50px;
+      height: 50px;
+      background-color: black;
+      border: none;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+    }
+    .nav-bar button:focus {
+      outline: 2px solid white;
+    }
+    .nav-bar button.home {
+      background-image: url('home.png');
+    }
+    .nav-bar button.leader {
+      background-image: url('leader.png');
+    }
+
+    .nav-bar button.airdrop {
+      background-image: url('airdrop.png');
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Total Players: <span id="totalPlayers">0</span></h2>
+    <h3>Total AB Coin Hold: <span id="totalAbCoin">0</span></h3>
+  </div>
+
+  <div class="box leaderboard">
+    <h3>Leaderboard</h3>
+    <div id="leaderboard"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <div class="nav-bar">
+    <button class="home" onclick="window.location.href='home.html'"></button>
+    <button class="leader" onclick="window.location.href='leader.html'"></button>
+   
+    <button class="airdrop" onclick="window.location.href='airdrop.html'"></button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAzxSL6N7FOXC8FuM6v11qJRODLIC4TJXE",
+      authDomain: "app-telegram-f4101.firebaseapp.com",
+      databaseURL: "https://app-telegram-f4101-default-rtdb.firebaseio.com",
+      projectId: "app-telegram-f4101",
+      storageBucket: "app-telegram-f4101.firebasestorage.app",
+      messagingSenderId: "67113105635",
+      appId: "1:67113105635:web:2d6049641a5b6ebca6edd6",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Elements
+    const totalPlayersEl = document.getElementById("totalPlayers");
+    const totalAbCoinEl = document.getElementById("totalAbCoin");
+    const leaderboardEl = document.getElementById("leaderboard");
+
+    // Number formatting function
+    function formatNumber(num) {
+      if (num >= 1e12) return (num / 1e12).toFixed(1) + "T";
+      if (num >= 1e9) return (num / 1e9).toFixed(1) + "B";
+      if (num >= 1e6) return (num / 1e6).toFixed(1) + "M";
+      if (num >= 1e3) return (num / 1e3).toFixed(1) + "K";
+      return num;
+    }
+
+    // Fetch data from Firebase
+    const usersRef = ref(database, "users");
+    onValue(usersRef, (snapshot) => {
+      const users = snapshot.val();
+      if (!users) return;
+
+      const userList = Object.values(users);
+
+      // Calculate total players and total AB Coin
+      const totalPlayers = userList.length;
+      const totalAbCoin = userList.reduce((sum, user) => sum + Number(user.abcoin || 0), 0);
+
+      // Update total players and AB Coin
+      totalPlayersEl.textContent = totalPlayers;
+      totalAbCoinEl.textContent = formatNumber(totalAbCoin);
+
+      // Sort users by AB Coin (highest to lowest)
+      const sortedUsers = userList.sort((a, b) => b.abcoin - a.abcoin);
+
+      // Generate leaderboard
+      leaderboardEl.innerHTML = "";
+      sortedUsers.forEach((user, index) => {
+        const leaderItem = document.createElement("div");
+        leaderItem.className = "leader-item";
+
+        const genderIcon = user.gender === "Female" ? "fmale.png" : "male.png";
+
+        leaderItem.innerHTML = `
+          <span class="rank">#${index + 1}</span>
+          <img src="${genderIcon}" alt="${user.gender}">
+          <span class="name">${user.name || "Unknown"}</span>
+          <span class="coin">${formatNumber(user.abcoin)} AB</span>
+        `;
+
+        leaderboardEl.appendChild(leaderItem);
+      });
+    });
+  </script>
+</body>
+</html>

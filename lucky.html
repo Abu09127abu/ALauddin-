@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucky Spin</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+    .container {
+      margin-top: 20px;
+    }
+    .wheel-container {
+      position: relative;
+      margin: 20px auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #1a8cff 0 60deg,
+        #ff1a75 60deg 120deg,
+        #33cc33 120deg 180deg,
+        #ff9933 180deg 240deg,
+        #6600cc 240deg 300deg,
+        #ff5050 300deg 360deg
+      );
+      border: 5px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wheel-label {
+      position: absolute;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+    }
+    .wheel-label img {
+      width: 30px;
+      vertical-align: middle;
+    }
+    #spin-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1a8cff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #spin-button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+    .countdown {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #1c1c1c;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+    .nav-bar button {
+      width: 50px;
+      height: 50px;
+      background-color: black;
+      border: none;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+    }
+    .nav-bar button:focus {
+      outline: 2px solid white;
+    }
+    .nav-bar button.home {
+      background-image: url('home.png');
+    }
+    .nav-bar button.leader {
+      background-image: url('leader.png');
+    }
+    .nav-bar button.lucky {
+      background-image: url('lucky.png');
+    }
+    .nav-bar button.airdrop {
+      background-image: url('airdrop.png');
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lucky Spin</h1>
+    <div class="wheel-container" id="wheel-container">
+      <div class="wheel-label" style="transform: rotate(30deg) translate(110px);">10 AB Coin <img src="coin.png"></div>
+      <div class="wheel-label" style="transform: rotate(90deg) translate(110px);">2 AB Coin <img src="coin.png"></div>
+      <div class="wheel-label" style="transform: rotate(150deg) translate(110px);">5 AB Coin <img src="coin.png"></div>
+      <div class="wheel-label" style="transform: rotate(210deg) translate(110px);">1 AB Coin <img src="coin.png"></div>
+      <div class="wheel-label" style="transform: rotate(270deg) translate(110px);">6 AB Coin <img src="coin.png"></div>
+    </div>
+    <button id="spin-button">Spin</button>
+    <div class="countdown" id="countdown"></div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="home" onclick="window.location.href='home.html'"></button>
+    <button class="leader" onclick="window.location.href='leader.html'"></button>
+    <button class="lucky" onclick="window.location.href='lucky.html'"></button>
+    <button class="airdrop" onclick="window.location.href='airdrop.html'"></button>
+  </div>
+
+  <script>
+    const spinButton = document.getElementById('spin-button');
+    const countdownEl = document.getElementById('countdown');
+    const wheelContainer = document.getElementById('wheel-container');
+
+    let spinsLeft = localStorage.getItem('spinsLeft') || 5;
+    let nextSpinTime = localStorage.getItem('nextSpinTime') || null;
+
+    // Check and set spins left
+    function checkSpinAvailability() {
+      const now = Date.now();
+      if (nextSpinTime && now > nextSpinTime) {
+        spinsLeft = 5;
+        localStorage.setItem('spinsLeft', 5);
+        localStorage.removeItem('nextSpinTime');
+      }
+
+      if (spinsLeft <= 0) {
+        const timeLeft = nextSpinTime - now;
+        startCountdown(timeLeft);
+        spinButton.disabled = true;
+      } else {
+        spinButton.disabled = false;
+        countdownEl.textContent = `Spins Left: ${spinsLeft}`;
+      }
+    }
+
+    // Start countdown for next spins
+    function startCountdown(ms) {
+      const interval = setInterval(() => {
+        const now = Date.now();
+        const timeLeft = nextSpinTime - now;
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          spinsLeft = 5;
+          localStorage.setItem('spinsLeft', 5);
+          localStorage.removeItem('nextSpinTime');
+          countdownEl.textContent = `Spins Left: ${spinsLeft}`;
+          spinButton.disabled = false;
+        } else {
+          const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+          const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+          countdownEl.textContent = `Next spins in: ${hours}h ${minutes}m ${seconds}s`;
+        }
+      }, 1000);
+    }
+
+    // Spin the wheel
+    function spinWheel() {
+      if (spinsLeft <= 0) return;
+
+      spinsLeft--;
+      localStorage.setItem('spinsLeft', spinsLeft);
+
+      const rewards = [10, 2, 5, 1, 6];
+      const selectedReward = rewards[Math.floor(Math.random() * rewards.length)];
+
+      const rotation = 360 * 3 + Math.random() * 360; // Rotate at least 3 full circles
+      wheelContainer.style.transition = 'transform 3s ease-out';
+      wheelContainer.style.transform = `rotate(${rotation}deg)`;
+
+      setTimeout(() => {
+        alert(`You won ${selectedReward} AB Coin!`);
+        const currentABCoin = parseInt(localStorage.getItem('abcoin') || '0');
+        localStorage.setItem('abcoin', currentABCoin + selectedReward);
+        checkSpinAvailability();
+      }, 3000);
+
+      if (spinsLeft <= 0) {
+        const now = Date.now();
+        nextSpinTime = now + 24 * 60 * 60 * 1000; // 24 hours
+        localStorage.setItem('nextSpinTime', nextSpinTime);
+      }
+    }
+
+    spinButton.addEventListener('click', spinWheel);
+
+    checkSpinAvailability();
+  </script>
+</body>
+</html>

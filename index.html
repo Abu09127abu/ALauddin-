@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loading-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #fff;
+            animation: loading 0.6s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+    </div>
+
+    <script>
+        // Check if user has already visited, if yes, redirect to home.html
+        if (localStorage.getItem('visitedBefore')) {
+            setTimeout(() => {
+                window.location.href = "home.html"; // Redirect to home.html after 5-7 seconds
+            }, 5000); // 5 seconds delay
+        } else {
+            // If not visited before, mark as visited and redirect to 1.html after 5-7 seconds
+            localStorage.setItem('visitedBefore', 'true');
+            setTimeout(() => {
+                window.location.href = "1.html"; // Redirect to 1.html after 5-7 seconds
+            }, 5000); // 5 seconds delay
+        }
+    </script>
+</body>
+</html>
