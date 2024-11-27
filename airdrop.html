@@ -20,9 +20,9 @@
 
     .coin-container {
       position: relative;
-      width: 200px;
-      height: 200px;
-      margin: 20px auto;
+      width: 120px;
+      height: 120px;
+      margin: 60px auto;
     }
 
     .coin-image {
@@ -166,13 +166,16 @@
       background-image: url('airdrop.png');
     }
 
-    /* Style for volume control */
-    .volume-control {
-      margin-top: 20px;
-    }
+    #ton-connect {
+    position: absolute;
+    top: 20px;   /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    z-index: 9999; /* Ensures it's on top of other elements */
+}
   </style>
 </head>
 <body>
+  <div id="ton-connect"></div>
   <div class="container">
     <div class="coin-container">
       <div class="coin-image"></div>
@@ -187,7 +190,7 @@
         <button id="play-pause">▶️ Play</button>
         <button id="next-song">⏭️ Next</button>
       </div>
-
+ <div id="ton-connect"></div>
       <!-- Volume control slider -->
       <div class="volume-control">
         <label for="volume-slider">Volume:</label>
@@ -202,6 +205,7 @@
     
     <button class="airdrop" onclick="window.location.href='airdrop.html'"></button>
   </div>
+
 
   <script>
     const audioPlayer = new Audio();
@@ -265,6 +269,14 @@
   currentSongIndex = (currentSongIndex + 1) % songs.length;
   playSong(currentSongIndex);
 });
-  </script>
+
+</script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://abu09127abu.github.io/Ab-coin-tast-/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect'
+    });
+</script>
 </body>
 </html>
