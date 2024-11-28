@@ -300,13 +300,8 @@
       audioPlayer.src = songs[currentSongIndex];
       audioPlayer.play();
     };
-    const openTonkeeper = () => {
-    window.location.href = "ton://transfer/UQDv1BTxlFAntDdfq9e7WHr6lgNBg_eoEnyXPuaA8wWhzabn?amount=20000000";
-};  
-const connectTonkeeper = () => {
-    const tonkeeperLink = "ton://transfer/UQDv1BTxlFAntDdfq9e7WHr6lgNBg_eoEnyXPuaA8wWhzabn?amount=20000000";
-    window.open(tonkeeperLink, "_self");
-};
+    
+
 
     document.getElementById("prev-song").addEventListener("click", () => {
       currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
